@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Donate</title>
+  <style>
+    :root{ --accent:#7b2ff7; --accent-2:#ff416c; --muted:#9fb3d6; --bg:#071029 }
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; background: linear-gradient(180deg,#071029 0%, #081226 60%); color:#e6eef8}
+    .wrap{display:flex;align-items:center;justify-content:center;height:100%;padding:1rem}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:20px;border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,0.6);text-align:left;min-width:320px;max-width:520px}
+    h1{margin:0 0 6px;font-size:18px;color:#e6eef8}
+    label{color:var(--muted);font-size:.95rem}
+  select, input[type=number]{ width:100%; padding:5px; font-size:0.83rem; border-radius:5px; border:1px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.02); color: #e6eef8 }
+    code{ font-family: monospace; color: #cfe3ff }
+    #feedback{ min-height:20px; margin-top:8px; color: var(--muted) }
+    button{ padding:8px 12px; border-radius:8px; border:0; cursor:pointer }
+    #btn-cancel{ background: transparent; border:1px solid rgba(255,255,255,0.04); color:#cfe3ff }
+    #btn-send{ background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:white }
+    .small{ font-size:.9rem; color:var(--muted) }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" id="card">
+      <h1 id="title">Donate</h1>
+      <div style="margin:8px 0" id="target">Receiving: <code id="target-pk"></code></div>
+
+      <div style="text-align:left;margin-top:8px">
+        <label style="display:block;margin-bottom:6px">Sender Wallet
+          <select id="wallet-select" style="width:100%;padding:5px;font-size:0.83rem;border-radius:5px;border:1px solid #e6eef8;margin-top:4px">
+            <option value="">(Loading...)</option>
+          </select>
+        </label>
+
+        <label style="display:block;margin-top:8px">Amount (XLM)
+          <input id="amount" type="number" step="0.0000001" value="1" style="width:100%;padding:5px;font-size:0.83rem;border-radius:5px;border:1px solid #e6eef8;margin-top:4px" />
+        </label>
+
+        <div id="feedback" style="margin-top:10px;min-height:20px;color:#7b2ff7"></div>
+
+        <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+          <button id="btn-cancel" style="padding:8px 10px;border-radius:6px;border:1px solid #dfe9f5;background:transparent;">Cancel</button>
+          <button id="btn-send" style="padding:8px 12px;border-radius:6px;background:#7b2ff7;color:#fff;border:0">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function(){
+      function qs(name){
+        const u = new URL(window.location.href);
+        return u.searchParams.get(name) || '';
+      }
+      const to = qs('to');
+      const title = qs('title');
+      document.getElementById('title').textContent = title ? title : 'Donate';
+      document.getElementById('target-pk').textContent = to || '—';
+
+      const feedback = document.getElementById('feedback');
+      const sel = document.getElementById('wallet-select');
+      const amount = document.getElementById('amount');
+      const btnSend = document.getElementById('btn-send');
+      const btnCancel = document.getElementById('btn-cancel');
+
+      btnCancel.addEventListener('click', ()=>{ window.close(); });
+
+      async function loadWallets(){
+        try{
+          const res = await fetch('/api/users/wallets', { credentials: 'include' });
+          if(!res.ok){ sel.innerHTML = '<option value="">(Giriş yapın)</option>'; return; }
+          const j = await res.json();
+          sel.innerHTML = '';
+          if(!j.wallets || j.wallets.length===0){ sel.innerHTML = '<option value="">(No registered wallets)</option>'; return; }
+          sel.innerHTML = '<option value="">(Select)</option>';
+          j.wallets.forEach(w => {
+            const opt = document.createElement('option');
+            opt.value = w.publicKey;
+            opt.textContent = w.name ? `${w.name} (${w.publicKey.slice(0,8)}…${w.publicKey.slice(-6)})` : `${w.publicKey.slice(0,8)}…${w.publicKey.slice(-6)}`;
+            sel.appendChild(opt);
+          });
+        }catch(e){ sel.innerHTML = '<option value="">(Hata)</option>'; }
+      }
+
+      btnSend.addEventListener('click', async ()=>{
+        feedback.style.color = '#334358'; feedback.textContent = 'Gönderiliyor...';
+        const pk = sel.value;
+        const amt = amount.value;
+        if(!pk){ feedback.style.color = '#8b1b1b'; feedback.textContent = 'Lütfen gönderen cüzdanı seçin.'; return; }
+        if(!amt){ feedback.style.color = '#8b1b1b'; feedback.textContent = 'Miktar gerekli.'; return; }
+        try{
+          const r = await fetch('/api/users/donate', { method: 'POST', credentials: 'include', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ publicKey: pk, to, amount: amt }) });
+          let j = null;
+          try{ j = await r.json(); }catch(_) { j = null; }
+          if(!r.ok){
+            console.error('donate popup error', r.status, j);
+            const msg = j && (j.error||j.message) ? (j.error||j.message) : ('Sunucu hatası ' + r.status);
+            feedback.style.color='#8b1b1b'; feedback.textContent = 'Hata: ' + msg;
+            if(r.status===401) { window.location.href = '/login.html'; }
+            return;
+          }
+          feedback.style.color = '#0b6623'; feedback.textContent = 'Gönderildi — tx: ' + (j && j.hash ? j.hash : '—');
+          try{ if(window.opener && typeof window.opener.refreshCampaigns === 'function') window.opener.refreshCampaigns(); }catch(e){}
+          setTimeout(()=>{ window.close(); }, 900);
+        }catch(e){ console.error('donate popup network error', e); feedback.style.color = '#8b1b1b'; feedback.textContent = 'Ağ hatası: ' + (e && e.message ? e.message : String(e)); }
+      });
+
+      // initial
+      loadWallets();
+    })();
+  </script>
+</body>
+</html>

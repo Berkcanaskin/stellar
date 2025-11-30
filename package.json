@@ -1,0 +1,29 @@
+{
+  "name": "stellar-simple-cli",
+  "version": "0.1.0",
+  "description": "Basit Stellar Testnet CLI: hesap bakiye kontrolü ve ödeme gönderme",
+  "main": "index.js",
+  "scripts": {
+  "start": "node server.js",
+    "test": "mocha --recursive"
+  },
+  "keywords": [
+    "stellar",
+    "stellar-sdk",
+    "testnet",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "stellar-sdk": "^10.0.0"
+  },
+  "devDependencies": {
+    "chai": "^4.3.8",
+    "mocha": "^10.2.0"
+  }
+}

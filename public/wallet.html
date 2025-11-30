@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cüzdan — Neighborhood Fund</title>
+  <style>
+    body{ font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; background: linear-gradient(180deg,#071029 0%, #081226 60%); color:#e6eef8; margin:0 }
+    .wrap{ max-width:720px; margin:3rem auto; padding:1rem }
+    .card{ background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.04); padding:1.25rem; border-radius:12px }
+    .small{ font-size:.9rem; color:#9fb3d6 }
+    .muted{ color:#9fb3d6 }
+    .label{ color:#9fb3d6; font-size:.9rem }
+    .value{ margin-top:.25rem; font-weight:600 }
+    button{ padding:.5rem .8rem; border-radius:8px; border:0; background: linear-gradient(90deg,#7b2ff7,#ff416c); color:white; cursor:pointer }
+    pre { background: rgba(255,255,255,0.02); padding:1rem; border-radius:8px; color:#cfe3ff; overflow:auto }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h2>Wallet Details</h2>
+      <div class="small muted">Public key and balance information</div>
+      <div style="margin-top:1rem">
+        <div class="label">Public Key</div>
+        <div id="pk" class="value">—</div>
+        <div class="label" style="margin-top:.75rem">Balance</div>
+        <div id="balances" style="margin-top:.25rem">Loading...</div>
+      </div>
+      <div style="margin-top:1rem">
+        <button id="btn-back" class="secondary">Back</button>
+      </div>
+    </div>
+  </div>
+  <script src="wallet.js"></script>
+</body>
+</html>

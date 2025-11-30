@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Basit Stellar Testnet UI</title>
+  <style>
+    :root{ --accent:#7b2ff7; --accent-2:#ff416c; --muted:#666; --bg:#0f1724; --card:#0b1020; --glass: rgba(255,255,255,0.04); }
+    html,body{ height:100%; }
+    body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin:0; padding:0; color:#e6eef8; background: linear-gradient(180deg,#071029 0%, #081226 60%); }
+    .container{ max-width:1100px; margin:2.2rem auto; padding:1rem; }
+    header{ display:flex; align-items:center; gap:1rem; justify-content:space-between; margin-bottom:1rem }
+    h1{ margin:0; font-size:1.6rem; color:linear-gradient(90deg,var(--accent),var(--accent-2)); }
+    .lead{ color:#9fb3d6; margin:0 }
+    .brand{ display:flex; gap:.75rem; align-items:center }
+    .logo{ width:44px; height:44px; border-radius:10px; background: linear-gradient(135deg,var(--accent),var(--accent-2)); display:flex; align-items:center; justify-content:center; font-weight:700; color:white }
+    .layout{ display:flex; gap:1rem; }
+    main{ flex:1 }
+    aside.sidebar{ width:340px }
+    .card{ background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.04); padding:1rem; border-radius:12px; box-shadow: 0 8px 30px rgba(2,6,23,0.6); margin-bottom:1rem }
+    label { display:block; margin-top: .5rem }
+  input[type=text], input[type=number], input[type=password], textarea, select { width:100%; padding:.4rem; font-size:0.86rem; border:1px solid rgba(255,255,255,0.06); border-radius:5px; background: rgba(255,255,255,0.02); color: #e6eef8 }
+    button { margin-top: .5rem; padding:.6rem 1rem; background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:white; border:0; border-radius:10px; cursor:pointer; box-shadow: 0 6px 18px rgba(123,47,247,0.16) }
+    button.secondary{ background:transparent; color:#cfe3ff; border:1px solid rgba(255,255,255,0.04) }
+    pre { background: rgba(255,255,255,0.02); padding:1rem; border-radius:8px; color:#cfe3ff; overflow:auto }
+    .campaign-row{ display:flex; justify-content:space-between; gap:1rem; align-items:center; padding:.75rem 0; border-bottom:1px solid rgba(255,255,255,0.02) }
+    .muted{ color:#9fb3d6 }
+    .progress{ height:12px; background: rgba(255,255,255,0.03); border-radius:999px; overflow:hidden }
+    .progress > i{ display:block; height:100%; background: linear-gradient(90deg,var(--accent),var(--accent-2)) }
+    .donation-item{ padding:.5rem; border-bottom:1px dashed rgba(255,255,255,0.02); font-size:.95rem }
+    .small{ font-size:.85rem }
+    @media (max-width:900px){ .layout{ flex-direction:column } .sidebar{ width:100% } }
+  /* info icon next to campaign titles */
+  .info-icon{ display:inline-block; width:18px; height:18px; line-height:18px; text-align:center; border-radius:50%; border:1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); color:#cfe3ff; font-size:.75rem; margin-left:.4rem; cursor:help }
+  </style>
+  <style>
+    /* Donate modal: style to match site theme (opaque box matching page background) */
+    #donate-modal > div { /* the inner box; use the same page background so it's not transparent */
+      background: linear-gradient(180deg,#071029 0%, #081226 60%);
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 6px 30px rgba(0,0,0,0.2);
+      color: #e6eef8;
+    }
+    #donate-modal input, #donate-modal textarea, #donate-modal select {
+      color: #e6eef8 !important;
+      background: rgba(255,255,255,0.02) !important;
+      border: 1px solid rgba(255,255,255,0.04) !important;
+      box-shadow: none !important;
+      border-radius: 6px;
+      padding: .45rem;
+    }
+    #donate-modal input::placeholder { color: rgba(255,255,255,0.4) !important; }
+    #donate-modal code { word-break: break-all; color: #cfe3ff; background: rgba(255,255,255,0.02); padding: .1rem .3rem; border-radius:4px }
+    #donate-modal .muted, #donate-modal #donate-feedback { color: #9fb3d6 !important; }
+    #donate-modal button.secondary { background:transparent; color:#cfe3ff; border:1px solid rgba(255,255,255,0.04) }
+  </style>
+  <style>
+    /* Visual improvements for donate modal */
+    #donate-modal .modal-body { display:flex; flex-direction:column; gap:.5rem }
+    #donate-title { color: #e6eef8; margin-top:0 }
+    #donate-target-pk { color: #7b2ff7; font-weight:700; display:block; margin-top:.25rem }
+    #donate-amount { font-size:1.05rem; padding:.55rem; border-radius:8px }
+    #donate-send[disabled] { opacity:.6; cursor:not-allowed }
+    .donate-success { color: #0b6623; background: rgba(11,102,35,0.06); padding:.5rem; border-radius:6px }
+    .donate-error { color: #8b1b1b; background: rgba(139,27,27,0.05); padding:.5rem; border-radius:6px }
+    #donate-feedback code { color: #8b1b1b }
+  </style>
+</head>
+<body>
+  <!-- Set this if your API is hosted on a separate server (e.g. on Render). Replace with your backend base URL, e.g. https://my-backend.onrender.com -->
+  <!-- When frontend is served from the same origin as the backend (e.g. via Render),
+    use a relative API base so requests are same-origin and cookies work. -->
+  <script>window.API_BASE = window.API_BASE || '';</script>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">NF</div>
+        <div>
+          <h1>Neighborhood Fund</h1>
+          <div class="lead">Make a Favor — Make a big difference with small donations (Testnet demo)</div>
+        </div>
+      </div>
+      <div id="auth-actions" style="display:flex;gap:.5rem;align-items:center">
+        <button id="btn-register" class="secondary">SignUp</button>
+        <a id="login-link" href="/login.html"><button class="secondary">LogIn</button></a>
+      </div>
+      
+    </header>
+
+    <div class="layout">
+      <main>
+        <section class="card">
+          <h2>How to donate</h2>
+          <p class="muted">By clicking the 'Donate' button in the 'Campaigns' section, you can contribute any desired amount using any wallet you have added to your account.</p>
+        </section>
+
+        <section class="card">
+          <h2>Campaigns</h2>
+          <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.5rem">
+            <button id="btn-refresh-campaigns" class="secondary">Refresh</button>
+            <div class="small muted">Community campaigns</div>
+          </div>
+          <div id="campaign-list">No campaigns yet</div>
+        </section>
+
+        <!-- Balance check moved to user dashboard (cüzdan management) -->
+
+        <!-- Ödeme gönder UI kaldırıldı; ödeme işlemleri kullanıcı panosuna taşındı -->
+
+      </main>
+
+      <aside class="sidebar">
+        <div class="card">
+          <h3>Live Donation Stream</h3>
+          <div class="muted small">Latest donations — who donated how much, to which campaign</div>
+          <div id="donation-feed" style="margin-top:.5rem; max-height:600px; overflow:auto">Loading...</div>
+        </div>
+        <div class="card" style="margin-top:1rem; text-align:center;">
+          <div class="muted small">Testnet demo — no real money used</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Donate Modal -->
+  <div id="donate-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); align-items:center; justify-content:center; z-index:2000;">
+  <div style="width:420px; max-width:92%; padding:1rem;">
+  <h3 id="donate-title" style="margin-top:0">Donate to campaign</h3>
+      <div class="muted" id="donate-target" style="margin-bottom:.5rem">Receiving account: <code id="donate-target-pk"></code></div>
+      <div class="modal-body">
+        <label>Currently Used Wallet
+          <select id="donate-wallet-select">
+            <option value="">(Select wallet)</option>
+          </select>
+        </label>
+        <label>Amount (XLM):<input id="donate-amount" type="number" step="0.0000001" value="1" style="margin-top:.25rem" /></label>
+      </div>
+      <div id="donate-feedback" style="margin-top:.5rem; font-size:.9rem; color:var(--muted)"></div>
+      <div style="display:flex; gap:.5rem; justify-content:flex-end; margin-top:.75rem">
+        <button class="secondary" id="donate-cancel">Cancel</button>
+        <button id="donate-send">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    // Ensure the Kayıt Ol button reliably opens the registration page
+    document.getElementById('btn-register')?.addEventListener('click', function(){
+      window.location.href = '/register.html';
+    });
+  </script>
+</body>
+</html>

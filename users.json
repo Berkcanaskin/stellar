@@ -1,0 +1,31 @@
+[
+  {
+    "username": "alice",
+    "passSalt": "5c7cd162bf1e431e8992f9704227517d",
+    "passHash": "9423a7eedeb18044005b5fd650046e31c2098192d040fc3bfc64c84487c153b3080fb83000ac64af44cdef2c4b8e4e5c8a4d0f9015c1a6acac0c7eb71830ecec",
+    "wallets": []
+  },
+  {
+    "username": "test",
+    "passSalt": "7410180b8d6872f2983a353f4ca35e96",
+    "passHash": "16769ea5b577cfd7364d8f4c77e118ec7add7a6a1b7e2f216d3c840216b13bf87bbddf624114550d9138b8184ca77fa35130808588b057c6cd479af31eddf283",
+    "wallets": [
+      {
+        "publicKey": "GAWFNVI5OVNBJ4VLYFTQPQMPNA2PDNGCJBFDNOFHBRI7BJDF3PQTV6K2",
+        "secret": "SDTVPFDMP4HC4CGQPLJZUWPF5NP7I6JY5DHLVXVIW6NXGTAYKQEESYMW",
+        "name": "1----"
+      },
+      {
+        "publicKey": "GCQVEVER4LII4BQ2JSZ5RH7OINTJ4FAYTHFESX6I45QGUUDZB45ETF6C",
+        "secret": "SAPXXG2WUWNMIM4D6TJTYDKYIQK7ZO3GI4UTMLQDHL7XDWUULIX7NKRP",
+        "name": "2-----"
+      }
+    ]
+  },
+  {
+    "username": "berkcan",
+    "passSalt": "12d2599e24fe71ee52bc6f193ee75e5a",
+    "passHash": "bccd10e5f1a5e5117ec57ea6e3b5556b6bc9c76670b69093d757d9cc2254071e3739e2ab59008e7c8f4e2c57cfa531d33e2afaae967bf7c605065a94a29b13e8",
+    "wallets": []
+  }
+]

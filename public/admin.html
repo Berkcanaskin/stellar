@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Neighborhood Fund — Admin</title>
+  <style>
+    /* reuse the app theme for admin */
+    :root{ --accent:#7b2ff7; --accent-2:#ff416c; }
+    body{ font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: linear-gradient(180deg,#071029 0%, #081226 60%); color:#e6eef8; margin:0; padding:1.6rem; }
+    .card{ background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.04); padding:1rem; border-radius:12px; max-width:980px; margin:0 auto 1rem }
+  input, textarea, select { width:100%; padding:.4rem; font-size:0.86rem; border-radius:5px; border:1px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.02); color:#e6eef8 }
+    button{ padding:.6rem 1rem; border-radius:10px; background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:white; border:0 }
+    .secondary{ background:transparent; border:1px solid rgba(255,255,255,0.04); color:#cfe3ff }
+    header h1{ margin:0 0 0.5rem 0 }
+    .muted{ color:#9fb3d6 }
+    /* admin per-key table */
+    .perkey-table{ width:100%; border-collapse:collapse; margin-top:.5rem }
+    .perkey-table th, .perkey-table td{ padding:.5rem .6rem; text-align:left; border-bottom:1px solid rgba(255,255,255,0.03) }
+    .perkey-table th{ font-size:.9rem; color:#cfe3ff }
+    .perkey-badge{ font-family: monospace; background:rgba(255,255,255,0.02); padding:.2rem .4rem; border-radius:6px; color:#e6eef8 }
+    .perkey-amount{ font-weight:600; color:#ffd7d9 }
+  </style>
+</head>
+<body>
+  <header style="max-width:980px;margin:0 auto 1rem"><h1>Neighborhood Fund — Admin</h1><div class="muted">Just log in with username/password.</div></header>
+
+  <div class="card" style="max-width:540px;margin:0 auto">
+    <div id="login-area">
+      <h3>Admin Login</h3>
+      <label>Username: <input id="admin-user" type="text" placeholder="admin" /></label>
+      <label>Password: <input id="admin-pass" type="password" placeholder="password" /></label>
+      <div style="display:flex;gap:.5rem;margin-top:.5rem"><button id="btn-admin-login">Log In</button><button id="btn-admin-refresh" class="secondary" style="margin-left:auto;">Refresh</button></div>
+      <pre id="admin-out">Please log in.</pre>
+    </div>
+    <div id="admin-area" style="display:none; margin-top:1rem">
+      <h3>Create Campaign</h3>
+      <label>Title: <input id="admin-title" type="text" placeholder="Park Repair" /></label>
+  <label>Goal (XLM): <input id="admin-goal" type="number" step="0.1" value="10" /></label>
+  <div style="margin-top:.5rem"><strong>Provide an existing account (public key required)</strong></div>
+  <label>Public Key (GD...): <input id="admin-public" type="text" placeholder="GD... (required)" /></label>
+  <div style="margin-top:.5rem"><label><input id="admin-perkey-toggle" type="checkbox" /> Show per-key donation totals</label></div>
+      <div style="display:flex;gap:.5rem;margin-top:.5rem"><button id="btn-admin-create">Create</button><button id="btn-admin-logout" class="secondary">Logout</button></div>
+      <pre id="admin-log">Admin actions log</pre>
+
+      <hr style="margin:1rem 0;border:none;border-top:1px solid rgba(255,255,255,0.03)" />
+      <h3>Campaigns</h3>
+      <div id="admin-list" class="muted">Loading...</div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
